@@ -1,0 +1,30 @@
+{ "rules_create_product_display_based_on_product" : {
+    "LABEL" : "Create Product Display based on product",
+    "PLUGIN" : "reaction rule",
+    "OWNER" : "rules",
+    "REQUIRES" : [ "rules", "entity" ],
+    "ON" : { "commerce_product_insert" : [] },
+    "DO" : [
+      { "entity_create" : {
+          "USING" : {
+            "type" : "node",
+            "param_type" : "catalog_item",
+            "param_title" : "[commerce-product:title]",
+            "param_author" : [ "commerce-product:creator" ]
+          },
+          "PROVIDE" : { "entity_created" : { "entity_created" : "Created entity" } }
+        }
+      },
+      { "data_set" : {
+          "data" : [ "entity-created:field-product-link" ],
+          "value" : [ "commerce-product" ]
+        }
+      },
+      { "data_set" : {
+          "data" : [ "entity-created:field-sku" ],
+          "value" : [ "commerce-product:sku" ]
+        }
+      }
+    ]
+  }
+}

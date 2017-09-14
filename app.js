@@ -14,49 +14,40 @@ const offer_json = './out_json/offer.json';
 
 const zeroprice = './out_json/zeroprice.json';
 
-
 process(); // Run
 
-const options = {
+const parserOptions = {
     explicitArray : false,
     ignoreAttrs   : true,
 };
 
-let parser = new xml2js.Parser(options);
+let parser = new xml2js.Parser(parserOptions);
 
 async function process() {
     let importFileData = await readFile(IMPORT_FILE);
     let offerFileData = await readFile(OFFER_FILE);
 
-    console.log('IMPORT_FILE ', importFileData.length);
-    console.log('OFFER_FILE ', offerFileData.length);
-
     let importFileData_obj = await XML2JS(importFileData);
     let offerFileData_obj = await XML2JS(offerFileData);
 
-    console.log('IMPORT_FILE OBJ ', JSON.stringify(importFileData_obj).length);
-    console.log('OFFER_FILE OBJ', JSON.stringify(offerFileData_obj).length);
-
     let selectedData = selectData(importFileData_obj, offerFileData_obj);
 
-    let productList = buildProdList(
+    let productList = buildProductList(
         selectedData.products,
         selectedData.terms,
         selectedData.category,
         selectedData.offers
     );
 
-    productList = filter_WITHimages(productList);
-    productList = filter_NONzeroprice(productList);
-    console.log(productList);
+    // Save to separate file items with zero price
+    // saveFile(zeroprice, JSON.stringify(filter_zeroprice(productList)));
 
-    // saveFile(offer_json, JSON.stringify(offerFileData_obj));
+    // productList = filter_WITHimages(productList);
+    productList = filter_NONzeroprice(productList);
+
     saveFile(resFile, JSON.stringify(productList));
 
-    saveFile(zeroprice, JSON.stringify(filter_zeroprice(productList)));
-
 }
-
 
 function selectData(importFileData, offerFilata) {
     return {
@@ -67,13 +58,9 @@ function selectData(importFileData, offerFilata) {
     };
 }
 
-function saveFile(file, data) {
-    fs.writeFileSync(file, data)
-}
+function buildProductList(products, terms, category, offers) {
 
-
-function buildProdList(products, terms, category, offers) {
-
+    let i = 0;
     let productList = products.map(el => {
 
         let attrtibutes = el.ЗначенияСвойств.ЗначенияСвойства;
@@ -96,13 +83,13 @@ function buildProdList(products, terms, category, offers) {
             title    : el.Наименование,
             img      : el.hasOwnProperty('Картинка') ? 'public://' + el.Картинка : null,
             category : getProperty(category, el.Категория),
-            price    : +getPrice(offers, el.Ид),
+            price    : +getPrice(offers, el.Ид), // Convert string to int
+            code     : i++,
             ...attr,
         }
 
     });
 
-    // console.log('New Arr ', productList);
     return productList;
 }
 
@@ -112,23 +99,15 @@ function getProperty(voc, term) {
 }
 
 function getValue(voc, term, val) {
-    // console.log('MATCH ', val.toString().match(/-/gi).length, typeof val);
+    let match = val.match(/-/gi); // Id includes  4 '-'
 
-    let match = val.match(/-/gi);
-
+    // If it is ID
     if (Array.isArray(match) && match.length === 4) {
-        // console.log('TERM  ', term);
-        // console.log('VAL ', val);
-        // console.log('VOC ', voc);
         let vocBook = voc.find(el => el.Ид === term).ВариантыЗначений.Справочник;
-        // console.log('Voc book ', vocBook);
         let valBook = Array.isArray(vocBook) ? vocBook.find(el => el.ИдЗначения === val).Значение : vocBook.Значение;
-        // console.log('Val Book', valBook);
         return valBook;
-        // let bookTerm = vocBook.find(el => el.ИдЗначения === term);
-
-        // return bookTerm
     } else {
+        // If it is not ID return same value
         return val;
     }
 }
@@ -145,6 +124,12 @@ async function readFile(file) {
         .catch(err => console.error(err.message));
 }
 
+
+function saveFile(file, data) {
+    fs.writeFileSync(file, data)
+}
+
+// Transform xml data to JS object
 function XML2JS(data) {
     return new Promise((resolve, reject) => {
             parser.parseString(data, (err, result) => {

@@ -1,0 +1,151 @@
+$feeds_importer = new stdClass();
+$feeds_importer->disabled = FALSE; /* Edit this to true to make a default feeds_importer disabled initially */
+$feeds_importer->api_version = 1;
+$feeds_importer->id = 'json_to_new_propd';
+$feeds_importer->config = array(
+  'name' => '1. JSON to NEW commerce prop',
+  'description' => '',
+  'fetcher' => array(
+    'plugin_key' => 'FeedsFileFetcher',
+    'config' => array(
+      'allowed_extensions' => 'txt csv tsv xml opml json',
+      'delete_uploaded_file' => 1,
+      'direct' => 0,
+      'directory' => 'public://feeds',
+      'allowed_schemes' => array(
+        'public' => 'public',
+      ),
+    ),
+  ),
+  'parser' => array(
+    'plugin_key' => 'FeedsJSONPathParser',
+    'config' => array(
+      'context' => '$.[]',
+      'sources' => array(
+        'jsonpath_parser:10' => 'sku',
+        'jsonpath_parser:0' => 'sku',
+        'jsonpath_parser:1' => 'title',
+        'jsonpath_parser:2' => 'price',
+        'jsonpath_parser:3' => 'img',
+        'jsonpath_parser:4' => 'lumen',
+        'jsonpath_parser:5' => 'kelvin',
+        'jsonpath_parser:6' => 'color',
+        'jsonpath_parser:7' => 'voltage',
+        'jsonpath_parser:8' => 'wattage',
+        'jsonpath_parser:9' => 'code',
+      ),
+      'debug' => array(
+        'options' => array(
+          'context' => 0,
+          'jsonpath_parser:10' => 0,
+          'jsonpath_parser:0' => 0,
+          'jsonpath_parser:1' => 0,
+          'jsonpath_parser:2' => 0,
+          'jsonpath_parser:3' => 0,
+          'jsonpath_parser:4' => 0,
+          'jsonpath_parser:5' => 0,
+          'jsonpath_parser:6' => 0,
+          'jsonpath_parser:7' => 0,
+          'jsonpath_parser:8' => 0,
+          'jsonpath_parser:9' => 0,
+        ),
+      ),
+      'allow_override' => 1,
+      'convert_four_byte' => 0,
+    ),
+  ),
+  'processor' => array(
+    'plugin_key' => 'FeedsCommerceProductProcessor',
+    'config' => array(
+      'product_type' => 'product',
+      'author' => '1',
+      'tax_rate' => TRUE,
+      'mappings' => array(
+        0 => array(
+          'source' => 'jsonpath_parser:10',
+          'target' => 'guid',
+          'unique' => 1,
+          'language' => 'und',
+        ),
+        1 => array(
+          'source' => 'jsonpath_parser:0',
+          'target' => 'sku',
+          'unique' => 1,
+          'language' => 'und',
+        ),
+        2 => array(
+          'source' => 'jsonpath_parser:1',
+          'target' => 'title',
+          'unique' => FALSE,
+          'language' => 'und',
+        ),
+        3 => array(
+          'source' => 'jsonpath_parser:2',
+          'target' => 'commerce_price:amount',
+          'unique' => FALSE,
+          'language' => 'und',
+        ),
+        4 => array(
+          'source' => 'jsonpath_parser:3',
+          'target' => 'field_product_image:uri',
+          'file_exists' => '1',
+        ),
+        5 => array(
+          'source' => 'jsonpath_parser:4',
+          'target' => 'field_lumen',
+          'unique' => FALSE,
+          'language' => 'und',
+        ),
+        6 => array(
+          'source' => 'jsonpath_parser:5',
+          'target' => 'field_kelvin',
+          'unique' => FALSE,
+          'language' => 'und',
+        ),
+        7 => array(
+          'source' => 'jsonpath_parser:6',
+          'target' => 'field_color',
+          'unique' => FALSE,
+          'language' => 'und',
+        ),
+        8 => array(
+          'source' => 'jsonpath_parser:7',
+          'target' => 'field_voltage',
+          'unique' => FALSE,
+          'language' => 'und',
+        ),
+        9 => array(
+          'source' => 'jsonpath_parser:8',
+          'target' => 'field_wattage',
+          'unique' => FALSE,
+          'language' => 'und',
+        ),
+        10 => array(
+          'source' => 'Blank source 1',
+          'target' => 'commerce_stock',
+          'unique' => FALSE,
+          'language' => 'und',
+        ),
+        11 => array(
+          'source' => 'jsonpath_parser:9',
+          'target' => 'field_product_code',
+          'unique' => FALSE,
+          'language' => 'und',
+        ),
+      ),
+      'insert_new' => '1',
+      'update_existing' => '2',
+      'update_non_existent' => 'skip',
+      'input_format' => 'plain_text',
+      'skip_hash_check' => 0,
+      'bundle' => 'product',
+      'language' => 'und',
+    ),
+  ),
+  'content_type' => '',
+  'update' => 0,
+  'import_period' => '-1',
+  'expire_period' => 3600,
+  'import_on_create' => 1,
+  'process_in_background' => 0,
+);
