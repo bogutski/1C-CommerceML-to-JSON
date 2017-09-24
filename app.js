@@ -13,6 +13,7 @@ const import_json = './out_json/import.json';
 const offer_json = './out_json/offer.json';
 
 const zeroprice = './out_json/zeroprice.json';
+const noimages = './out_json/noimages.json';
 
 process(); // Run
 
@@ -40,7 +41,10 @@ async function process() {
     );
 
     // Save to separate file items with zero price
-    // saveFile(zeroprice, JSON.stringify(filter_zeroprice(productList)));
+    saveFile(zeroprice, JSON.stringify(filter_zeroprice(productList)));
+
+    // Save to separate file items without image
+    saveFile(noimages, JSON.stringify(filter_WITHOUTimages(productList)));
 
     // productList = filter_WITHimages(productList);
     productList = filter_NONzeroprice(productList);
@@ -147,6 +151,10 @@ function filter_NONzeroprice(productList) {
 
 function filter_WITHimages(productList) {
     return productList.filter(el => el.img !== null);
+}
+
+function filter_WITHOUTimages(productList) {
+    return productList.filter(el => el.img === null);
 }
 
 function filter_zeroprice(productList) {
