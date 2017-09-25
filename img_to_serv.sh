@@ -3,7 +3,7 @@
 #Инициализируем переменные
 
 RemoteSSHUser="root"
-RemoteSSHIP="138.197.209.00"
+RemoteSSHIP="138.197.209.55"
 RemoteSiteDir="/var/www/html/drupal/sites/default/files/import_files/"
 lclSiteDir="/Users/m/sites/js/node1/in_xml/import_files/"
 
