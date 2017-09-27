@@ -152,3 +152,10 @@ function filter_WITHimages(productList) {
 function filter_zeroprice(productList) {
     return productList.filter(el => el.price === 0).sort((a, b) => a.sku.localeCompare(b.sku));
 }
+
+let addTwo = (num1, num2) => {
+    return num1 + num2;
+}
+export {addTwo}
+
+ // export { filter_NONzeroprice };
