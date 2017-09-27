@@ -5,7 +5,6 @@ const fs = require('fs'),
 
 const IMPORT_FILE = './in_xml/import.xml';
 const OFFER_FILE = './in_xml/offers.xml';
-const testFile = './in_xml/small.xml';
 
 const resFile = './out_json/res.json';
 
